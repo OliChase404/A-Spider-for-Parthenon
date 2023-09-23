@@ -8,7 +8,7 @@ The app will request the following inputs:
 
 - Max Recursion Depth - this is the maximum number of links the spider will follow before stopping
 
-- Spider Asserts? - this is a boolean value that determines whether the spider will capture should capture page assets such as images, css, and     javascript files. If set to false the spider will only capture links contained in <a href> tags.
+- Spider Asserts? - this is a boolean value that determines whether the spider will capture should capture page assets such as images, css, and     javascript files. If set to false the spider will only capture links contained in ```<a href>``` tags.
 
 - Use rate limiting? - this is a boolean value that determines whether the spider will limit the number of requests it makes per second. If set to true, you will be prompted to enter the number of requests per second you would like to limit the spider to.
 
