@@ -23,6 +23,11 @@ This is a CLI based app so it is best to run it in a seperate terminal window. R
 
 -------------------------
 
+Captured file will be saved in the root directory of the app. The folder names will be based on the URL where the file was found.
+A UTC time stamp will be appended to the folder name to preserve the time at which the file was captured.
+
+-------------------------
+
 Rate limiting and Max threads should be adjusted to avoid overloading the target server. If the spider is making too many requests per second, or using too many threads, the target server may block the spider's IP address. If this happens, the spider will stop and you will need to restart the app. A good starting point is around 5 requests per second for rate limiting and max threads also set to 5.
 If you're seeing a lot of errors in the output, try using a lower value for rate limiting and max threads. 
 
