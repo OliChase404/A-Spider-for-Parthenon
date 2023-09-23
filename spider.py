@@ -81,9 +81,6 @@ class Spider:
         except Exception as e:
             print(f"Error downloading {url}: {e}")
 
-    def shutdown(self):
-        self.executor.shutdown()
-
 
 
 #----------------------------------------- Interface -----------------------------------------
@@ -130,7 +127,6 @@ def main_menu():
     if choice == 'y':
         crawler = Spider(start_url, max_depth, spider_assets)
         crawler.crawl(start_url, 0, rate_limit, max_threads)
-        crawler.shutdown()
     elif choice == 'n':
         clear()
         main_menu()

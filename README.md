@@ -19,4 +19,14 @@ The app will request the following inputs:
 
 Notes:
 
+This is a CLI based app so it is best to run it in a seperate terminal window. Running it in an IDE such as PyCharm or VS Code will work, but the output may not be formatted correctly.
+
+-------------------------
+
 Rate limiting and Max threads should be adjusted to avoid overloading the target server. If the spider is making too many requests per second, or using too many threads, the target server may block the spider's IP address. If this happens, the spider will stop and you will need to restart the app. A good starting point is around 5 requests per second for rate limiting and max threads also set to 5.
+If you're seeing a lot of errors in the output, try using a lower value for rate limiting and max threads. 
+
+-------------------------
+
+Some website do not allow web crawlers to access their site. If you are having trouble crawling a site, try using a different target URL. For example, https://www.google.com will not work, but https://www.google.com/search?q=parthenon will work.
+
