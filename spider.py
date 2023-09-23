@@ -18,16 +18,26 @@ class Spider:
         self.max_depth = max_depth
         self.spider_assets = spider_assets
         self.visited_links = set()
+        # Create a timestamp to be used in the folder name
         timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
         # Extract the path component from the URL and use it in the folder name
-        path_component = urlparse(start_url).path.replace('/', '_')
-        self.target_folder = f"{path_component}_{timestamp}"
+        parsed_url = urlparse(start_url)
+        # Combine the netloc and path components to create the folder name
+        folder_name = f"{parsed_url.netloc}_{parsed_url.path.replace('/', '_')}"
+        self.target_folder = f"{folder_name}_{timestamp}"
         os.makedirs(self.target_folder, exist_ok=True)
     
     def save_resource(self, url, content):
-        filename = os.path.join(self.target_folder, os.path.basename(urlparse(url).path))
+        parsed_url = urlparse(url)
+        # If the URL ends with '/', treat it as a directory and create an index.html file inside
+        if parsed_url.path.endswith('/'):
+            filename = os.path.join(self.target_folder, parsed_url.netloc, parsed_url.path, 'index.html')
+        else:
+            filename = os.path.join(self.target_folder, parsed_url.netloc, parsed_url.path.lstrip('/'))
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'wb') as f:
             f.write(content)
+
 
     def crawl(self, url, depth):
         if depth > self.max_depth:
@@ -96,7 +106,6 @@ def main_menu():
         crawler = Spider(start_url, max_depth, spider_assets)
         crawler.crawl(start_url, 0)
     elif choice == 'n':
-        print('Exiting...')
         clear()
         main_menu()
 
@@ -104,7 +113,7 @@ def main_menu():
 #-----------------------------------------
 
 if __name__ == "__main__":
-    start_url = "https://en.wikipedia.org/wiki/Philosophy"  # Replace with your desired starting URL
+    start_url = "https://en.wikipedia.org/wiki/Philosophy"
     max_depth = 2
     spider_assets = True
 
