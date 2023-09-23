@@ -8,7 +8,7 @@ from rich import print
 from rich.console import Console
 from assets import *
 import time
-from concurrent.futures import ThreadPoolExecutor  # Import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 
 terminal_width = os.get_terminal_size().columns
 console = Console()
@@ -49,7 +49,7 @@ class Spider:
         try:
             response = requests.get(url, headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"})
             
-            # Add rate limiting: Sleep for a few seconds before each request
+            # Add rate limiting
             time.sleep(rate_limit)
             
             if response.status_code == 200:
@@ -59,7 +59,6 @@ class Spider:
 
                 soup = BeautifulSoup(response.text, 'html.parser')
 
-                # Create a ThreadPoolExecutor with a maximum number of threads
                 with ThreadPoolExecutor(max_workers=max_threads) as executor:
                     # Spider links in <a href>
                     for link in soup.find_all('a', href=True):
@@ -134,9 +133,9 @@ def main_menu():
 #-----------------------------------------
 
 if __name__ == "__main__":
-    start_url = "https://en.wikipedia.org/wiki/Philosophy"
-    max_depth = 2
-    spider_assets = True
+    # start_url = "https://en.wikipedia.org/wiki/Philosophy"
+    # max_depth = 2
+    # spider_assets = True
 
     clear()
     main_menu()
