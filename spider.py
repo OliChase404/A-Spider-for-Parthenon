@@ -91,7 +91,7 @@ def main_menu():
     banner()
     choice = input('Enter Target URL-->>> ')
     if choice == '':
-        print('Please enter a URL')
+        clear()
         main_menu()
     else:
         start_url = choice
