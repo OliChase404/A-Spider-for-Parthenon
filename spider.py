@@ -2,11 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
 import os
-from datetime import datetime
+from datetime import datetime 
 import threading
 from rich import print
 from rich.console import Console
 from assets import *
+import time
+from concurrent.futures import ThreadPoolExecutor  # Import ThreadPoolExecutor
 
 terminal_width = os.get_terminal_size().columns
 console = Console()
@@ -29,7 +31,6 @@ class Spider:
     
     def save_resource(self, url, content):
         parsed_url = urlparse(url)
-        # If the URL ends with '/', treat it as a directory and create an index.html file inside
         if parsed_url.path.endswith('/'):
             filename = os.path.join(self.target_folder, parsed_url.netloc, parsed_url.path, 'index.html')
         else:
@@ -39,7 +40,7 @@ class Spider:
             f.write(content)
 
 
-    def crawl(self, url, depth):
+    def crawl(self, url, depth, rate_limit=0, max_threads=10):
         if depth > self.max_depth:
             return
 
@@ -47,6 +48,10 @@ class Spider:
             return
         try:
             response = requests.get(url, headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"})
+            
+            # Add rate limiting: Sleep for a few seconds before each request
+            time.sleep(rate_limit)
+            
             if response.status_code == 200:
                 self.visited_links.add(url)
                 print(f"Downloading: {url} (Size: {len(response.content)} bytes)")
@@ -54,11 +59,13 @@ class Spider:
 
                 soup = BeautifulSoup(response.text, 'html.parser')
 
-                # Spider links in <a href>
-                for link in soup.find_all('a', href=True):
-                    next_url = urljoin(url, link['href'])
-                    # Create a new thread for each URL to be crawled
-                    threading.Thread(target=self.crawl, args=(next_url, depth + 1)).start()
+                # Create a ThreadPoolExecutor with a maximum number of threads
+                with ThreadPoolExecutor(max_workers=max_threads) as executor:
+                    # Spider links in <a href>
+                    for link in soup.find_all('a', href=True):
+                        next_url = urljoin(url, link['href'])
+                        # Submit each URL to the executor for crawling
+                        executor.submit(self.crawl, next_url, depth + 1)
 
                 if self.spider_assets:
                     # Spider assets in CSS files
@@ -95,19 +102,51 @@ def main_menu():
     choice = input('Spider Assets? (y/n)-->>> ')
     if choice == 'y':
         spider_assets = True
-    elif choice == 'n':
-        spider_assets = False
     else:
-        print('Please enter y or n')
-        main_menu()
+        spider_assets = False
     print('Spider Assets: ' + str(spider_assets))
+
+    choice = input('Use rate limiting? (y/n)-->>> ')
+    if choice == 'y':
+        max_requests = input('Enter max requests per second--->>>')
+        rate_limit = 1 / int(max_requests)
+        print('Rate Limit: ' + str(max_requests) + ' requests per second')
+    else: 
+        rate_limit = 0
+        print('Rate Limit: None')
+
+    max_threads = input('Enter max threads-->>> ')
+    if max_threads == '':
+        max_threads = 10
+    else:
+        max_threads = int(max_threads)
+    print('Max Threads: ' + str(max_threads))
+
     choice = input('Start Spider? (y/n)-->>> ')
     if choice == 'y':
         crawler = Spider(start_url, max_depth, spider_assets)
-        crawler.crawl(start_url, 0)
+        crawler.crawl(start_url, 0, rate_limit, max_threads)
     elif choice == 'n':
         clear()
         main_menu()
+
+
+    # choice = input('Start Spider? (y/n)-->>> ')
+    # if choice == 'y':
+    #     crawler = Spider(start_url, max_depth, spider_assets)
+    #     crawler.crawl(start_url, 0, rate_limit) 
+    # elif choice == 'n':
+    #     clear()
+    #     main_menu()
+            
+
+    # choice = input('Start Spider? (y/n)-->>> ')
+    # if choice == 'y':
+    #     crawler = Spider(start_url, max_depth, spider_assets)
+    #     crawler.crawl(start_url, 0)
+    # elif choice == 'n':
+    #     clear()
+    #     main_menu()
 
 
 #-----------------------------------------
