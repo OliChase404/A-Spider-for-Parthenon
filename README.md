@@ -1,6 +1,6 @@
 This is a simple web spider CLI app for Parthenon Software Group.
 
-To run the app, simply navigate to the root directory, run pipenv install to install the dependencies and then run python spider.py to start the app.
+To run the app, simply navigate to the root directory, run ```pipenv install``` to install the dependencies and then run ```python spider.py``` to start the app.
 
 The app will request the following inputs:
 
