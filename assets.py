@@ -8,7 +8,7 @@ console = Console()
 def banner():
     print('-' * int(terminal_width / 2))
     console.print("""
-   [bright_green]
+   [bright_red]
 
    ____  _ _ _        _____       _     _           
   / __ \| (_| )      / ____|     (_)   | |          
