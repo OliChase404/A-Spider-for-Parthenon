@@ -9,6 +9,7 @@ from rich.console import Console
 from assets import *
 import time
 from concurrent.futures import ThreadPoolExecutor
+from mimetypes import guess_extension
 
 terminal_width = os.get_terminal_size().columns
 console = Console()
@@ -41,45 +42,45 @@ class Spider:
             f.write(content)
 
 
-def crawl(self, url, depth, rate_limit=0, max_threads=10):
-    if depth > self.max_depth:
-        return
+    def crawl(self, url, depth, rate_limit=0, max_threads=10):
+        if depth > self.max_depth:
+            return
 
-    if url in self.visited_links:
-        return
+        if url in self.visited_links:
+            return
 
-    try:
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"})
+        try:
+            response = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"})
 
-        # Add rate limiting: Sleep for a few seconds before each request
-        time.sleep(rate_limit)
+            # Add rate limiting: Sleep for a few seconds before each request
+            time.sleep(rate_limit)
 
-        if response.status_code == 200:
-            self.visited_links.add(url)
-            print(f"Downloading: {url} (Size: {len(response.content)} bytes)")
-            self.save_resource(url, response.content)
+            if response.status_code == 200:
+                self.visited_links.add(url)
+                print(f"Downloading: {url} (Size: {len(response.content)} bytes)")
+                self.save_resource(url, response.content)
 
-            soup = BeautifulSoup(response.text, 'html.parser')
+                soup = BeautifulSoup(response.text, 'html.parser')
 
-            # Collect CSS and JavaScript assets
-            css_assets = [urljoin(url, link['href']) for link in soup.find_all('link', rel='stylesheet')]
-            js_assets = [urljoin(url, script['src']) for script in soup.find_all('script', src=True)]
+                # Collect CSS and JavaScript assets
+                css_assets = [urljoin(url, link['href']) for link in soup.find_all('link', rel='stylesheet')]
+                js_assets = [urljoin(url, script['src']) for script in soup.find_all('script', src=True)]
 
-            # Create a ThreadPoolExecutor with a maximum number of threads to crawl assets
-            with ThreadPoolExecutor(max_workers=max_threads) as executor:
-                # Spider links in <a href>
-                for link in soup.find_all('a', href=True):
-                    next_url = urljoin(url, link['href'])
-                    # Submit each URL to the executor for crawling
-                    executor.submit(self.crawl, next_url, depth + 1)
+                # Create a ThreadPoolExecutor with a maximum number of threads to crawl assets
+                with ThreadPoolExecutor(max_workers=max_threads) as executor:
+                    # Spider links in <a href>
+                    for link in soup.find_all('a', href=True):
+                        next_url = urljoin(url, link['href'])
+                        # Submit each URL to the executor for crawling
+                        executor.submit(self.crawl, next_url, depth + 1)
 
-                if self.spider_assets:
-                    # Crawl CSS and JavaScript assets in parallel threads
-                    executor.submit(self.crawl_assets, css_assets, depth + 1, max_threads)
-                    executor.submit(self.crawl_assets, js_assets, depth + 1, max_threads)
+                    if self.spider_assets:
+                        # Crawl CSS and JavaScript assets in parallel threads
+                        executor.submit(self.crawl, css_assets, depth + 1, max_threads)
+                        executor.submit(self.crawl, js_assets, depth + 1, max_threads)
 
-    except Exception as e:
-        print(f"Error downloading {url}: {e}")
+        except Exception as e:
+            print(f"Error downloading {url}: {e}")
 
 
 
