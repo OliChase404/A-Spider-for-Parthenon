@@ -14,6 +14,8 @@ terminal_width = os.get_terminal_size().columns
 console = Console()
 def clear(): return os.system('tput reset')
 
+#New Branch test
+
 class Spider:
     def __init__(self, start_url, max_depth, spider_assets):
         self.start_url = start_url
