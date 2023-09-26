@@ -3,13 +3,12 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
 import os
 from datetime import datetime 
-import threading
 from rich import print
 from rich.console import Console
 from assets import *
 import time
 from concurrent.futures import ThreadPoolExecutor
-from mimetypes import guess_extension
+
 
 terminal_width = os.get_terminal_size().columns
 console = Console()
@@ -52,7 +51,7 @@ class Spider:
         try:
             response = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"})
 
-            # Add rate limiting: Sleep for a few seconds before each request
+            # Add rate limiting
             time.sleep(rate_limit)
 
             if response.status_code == 200:

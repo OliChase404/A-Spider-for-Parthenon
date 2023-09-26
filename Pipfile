@@ -9,7 +9,7 @@ ipdb = "*"
 beautifulsoup4 = "4.11.1"
 requests = "*"
 bs4 = "*"
-
+selenium = "*"
 
 [dev-packages]
 
